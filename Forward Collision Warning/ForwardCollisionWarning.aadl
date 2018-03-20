@@ -1,0 +1,350 @@
+package ForwardCollisionWarning
+public
+	with variables;
+	
+annex EMV2
+{**
+	error types
+	  StatusError 				: type;  
+	  ValueError				: type;
+	  InternalError 			: type; 
+	  SensorStatusError 		: type extends StatusError;
+	  SpeedWrongValue			: type extends ValueError;
+	  DistanceWrongValue		: type extends ValueError;
+	  ThreadFault renames type ErrorLibrary::EarlyServiceTermination;
+	end types;
+	
+	error behavior ErrorStates
+	  events 
+			BadValue	: error event;
+			LateValue	: error event;
+			Fail		: error event;
+	  states 
+	    Operational 	: initial state; 
+	    Failed 			: state;
+	  transitions
+	    WorkingTransition	: Operational -[Fail]-> Failed;
+	end behavior;
+**};	
+	
+system ForwardCollisionWarning	
+end ForwardCollisionWarning;
+
+
+system implementation ForwardCollisionWarning.impl
+	subcomponents
+		driver: system driver.impl;
+		vehicle_obe: system vehicle_obe.impl;
+		vehicle_databus: system vehicle_databus.impl;
+		remote_vehicle_obe: system remote_vehicle_obe.impl;	
+	connections
+	dr_ip : port driver.driver_input -> vehicle_obe.drvr_ip;
+	dr_rqst : port 	driver.request_for_service -> vehicle_obe.reqst_serv;
+	dr_ip_info : port vehicle_databus.driver_input_info -> vehicle_obe.drvr_ip_info;
+	host_veh_st: port vehicle_databus.host_vehicle_status -> vehicle_obe.host_vehi_status;
+	col_warn_info : port vehicle_obe.collision_warn -> vehicle_databus.collision_warning_info;
+	dr_updt_info : port vehicle_obe.drvr_update_info -> vehicle_databus.driver_update_info;
+	pre_crash_info : port vehicle_obe.pre_crash_control -> vehicle_databus.pre_crash_control_info;
+	veh_ctrl_info : port vehicle_obe.vehi_contr_info -> vehicle_databus.vehicle_control_info;
+	veh_ctrl_opt_info : port vehicle_obe.vehi_contr_opti_info -> vehicle_databus.vehicle_control_optimizaion_info;
+	pre_crash : port vehicle_obe.pre_crash_control -> vehicle_databus.pre_crash_control_info;
+	emrgncy_ack : port remote_vehicle_obe.em_ack -> vehicle_obe.em_ack;
+	emrgncy_notif : port remote_vehicle_obe.em_noti -> vehicle_obe.em_noti;
+	emrgncy_notif_relay : port remote_vehicle_obe.em_noti_r -> vehicle_obe.em_noti_r;
+	intersectn_infr_info : port remote_vehicle_obe.int_info -> vehicle_obe.int_info;
+	spl_veh_alert : port remote_vehicle_obe.sp_vehicle -> vehicle_obe.sp_vehicle;
+	veh_ctrl_evt : port remote_vehicle_obe.vehi_control -> vehicle_obe.vehi_control;
+	veh_env_data : port remote_vehicle_obe.vehi_env -> vehicle_obe.vehi_env;
+	veh_hazard_evt : port remote_vehicle_obe.vehi_hazard -> vehicle_obe.vehi_hazard; 
+	veh_loc_motion : port remote_vehicle_obe.vehi_lm -> vehicle_obe.vehi_lm;
+	veh_plt_coord : port remote_vehicle_obe.vehi_plat -> vehicle_obe.vehi_plat;	
+	emrgncy_ack_1 : port vehicle_obe.em_ack -> remote_vehicle_obe.em_ack;
+	emrgncy_notif_1 : port vehicle_obe.em_noti -> remote_vehicle_obe.em_noti;
+	emrgncy_notif_relay_1 : port vehicle_obe.em_noti_r -> remote_vehicle_obe.em_noti_r;
+	intersectn_infr_info_1 : port vehicle_obe.int_info -> remote_vehicle_obe.int_info;
+	spl_veh_alert_1 : port vehicle_obe.sp_vehicle -> remote_vehicle_obe.sp_vehicle;
+	veh_ctrl_evt_1 : port vehicle_obe.vehi_control -> remote_vehicle_obe.vehi_control;
+	veh_env_data_1 : port vehicle_obe.vehi_env -> remote_vehicle_obe.vehi_env;
+	veh_hazard_evt_1 : port vehicle_obe.vehi_hazard -> remote_vehicle_obe.vehi_hazard; 
+	veh_loc_motion_1 : port vehicle_obe.vehi_lm -> remote_vehicle_obe.vehi_lm;
+	veh_plt_coord_1 : port vehicle_obe.vehi_plat -> remote_vehicle_obe.vehi_plat;		
+end ForwardCollisionWarning.impl;
+
+system driver
+	features
+		driver_updates : in data port;
+		request_for_service : out data port;
+		driver_input : out data port;
+	annex EMV2 
+	  {** 
+	    use types ErrorLibrary, ForwardCollisionWarning ;
+		error propagations
+		  driver_input: out propagation {ValueError};
+		  request_for_service: out propagation {InternalError};
+		  driver_updates : in propagation {InternalError};
+		end propagations;
+	  **};	
+				
+end driver;
+	
+system implementation driver.impl
+end driver.impl;
+
+system vehicle_databus
+	features
+		collision_warning_info : in data port;
+		driver_update_info : in data port;
+		pre_crash_control_info : in data port;
+		vehicle_control_info : in data port;
+		vehicle_control_optimizaion_info : in data port;
+		driver_input_info : out data port;
+		host_vehicle_status : out data port;
+	annex EMV2 
+	  {** 
+	    use types ErrorLibrary, ForwardCollisionWarning ;
+		error propagations
+		  collision_warning_info: in propagation {ValueError};
+		  driver_update_info: in propagation {ValueError};
+		  pre_crash_control_info : in propagation {InternalError};
+		  vehicle_control_info : in propagation {ValueError};
+		  vehicle_control_optimizaion_info : in propagation {ValueError};
+		  driver_input_info : out propagation {ValueError};
+		  host_vehicle_status : out propagation {InternalError};
+		end propagations;
+	  **};	
+end vehicle_databus;
+
+system implementation vehicle_databus.impl
+end vehicle_databus.impl;
+
+system vehicle_obe
+	features
+		drvr_ip : in data port;
+		reqst_serv : in data port;
+		em_ack : in out data port;
+		em_noti : in out data port;
+		em_noti_r : in out data port;
+		int_info : in out data port;
+		sp_vehicle : in out data port;
+		vehi_control : in out event port;
+		vehi_env : in out data port;
+		vehi_hazard : in out event port;
+		vehi_lm : in out data port;
+		vehi_plat : in out data port;
+		drvr_ip_info : in data port;
+		host_vehi_status : in data port;
+		drvr_update : out data port;
+		collision_warn : out data port;
+		drvr_update_info: out data port;
+		pre_crash_control : out data port;
+		vehi_contr_info : out data port;
+		vehi_contr_opti_info: out data port;	
+	annex EMV2 
+	{** 
+	    use types ErrorLibrary, ForwardCollisionWarning ;
+		error propagations
+		  drvr_ip: in propagation {ValueError};
+		  reqst_serv: in propagation {InternalError};
+		  vehi_control : in propagation {StatusError};
+		  vehi_lm : in propagation {ValueError};
+		  drvr_ip_info : in propagation {ValueError};
+		  host_vehi_status : in propagation {InternalError};
+		  collision_warn : out propagation {ValueError};
+		  pre_crash_control: out propagation {InternalError};
+		end propagations;
+	 **};	
+end vehicle_obe;
+
+system implementation vehicle_obe.impl
+	subcomponents
+		veh_basic_safety : system veh_basic_safety.impl;
+end vehicle_obe.impl;
+
+system veh_basic_safety
+end veh_basic_safety;
+
+system implementation veh_basic_safety.impl
+	subcomponents
+		coll_crash_avoid : process collision_crash_avoid_data.impl;
+		comm_with_remote_veh : process comm_with_remote_veh.impl;
+		veh_sensor_data : process veh_sensor_data.impl;
+		veh_location_data : process veh_location_data.impl;
+end veh_basic_safety.impl;
+
+process collision_crash_avoid_data	
+	features
+		collision_data : in data port variables::distance;
+		pos_warng : in data port variables::distance;	
+		veh_loc_on_road : in data port variables::distance;
+	annex EMV2 
+	{** 
+	    use types ErrorLibrary, ForwardCollisionWarning ;
+		error propagations
+		  collision_data: in propagation {SensorStatusError};
+		  pos_warng: in propagation {SensorStatusError, DistanceWrongValue};
+		  veh_loc_on_road : in propagation {SensorStatusError, DistanceWrongValue};
+		end propagations;
+	 **};
+end collision_crash_avoid_data;
+
+process implementation collision_crash_avoid_data.impl
+	subcomponents
+		veh_motion_data : thread veh_motion_data.impl;
+		veh_proximity_data : thread veh_proximity_data.impl;
+	connections
+		left : port pos_warng -> veh_motion_data.left;
+		rear : port pos_warng -> veh_motion_data.rear;
+		side : port pos_warng -> veh_motion_data.side;
+		distance1 : port veh_loc_on_road -> veh_proximity_data.dist;
+		near : port veh_loc_on_road -> veh_proximity_data.near;
+		far : port veh_loc_on_road -> veh_proximity_data.far;
+		near1 :  port collision_data -> veh_proximity_data.near;
+		far1 :  port collision_data -> veh_proximity_data.far;
+		
+end collision_crash_avoid_data.impl;
+
+thread veh_motion_data
+	features
+		left : in data port variables::distance;
+		rear : in data port variables::distance;
+		side : in data port variables::distance;	
+	annex EMV2 
+	  {** 
+	    use types ErrorLibrary,ForwardCollisionWarning;
+	  error propagations
+	  left: out propagation {DistanceWrongValue};
+	  rear: out propagation {DistanceWrongValue};
+	  side: in propagation {DistanceWrongValue};
+	  end propagations;  
+	  **};	
+end veh_motion_data;
+
+thread implementation veh_motion_data.impl
+end veh_motion_data.impl;
+
+thread veh_proximity_data
+	features
+		dist : in data port variables::distance;
+		near : in data port variables::distance;
+		far : in data port variables::distance;
+	annex EMV2 
+	  {** 
+	    use types ErrorLibrary, ForwardCollisionWarning ;
+		error propagations
+		  dist: out propagation {DistanceWrongValue};
+		  near: out propagation {DistanceWrongValue};
+		  far : in propagation {DistanceWrongValue};
+		end propagations;
+	  **};
+end veh_proximity_data;
+
+thread implementation veh_proximity_data.impl
+end veh_proximity_data.impl;
+
+process comm_with_remote_veh
+	features
+		frv_obstacle_detection : in data port variables::distance;
+		frv_speed : in data port variables::speed;
+		frv_veh_location : in data port variables::distance;
+		trv_speed : out data port variables::speed;
+		trv_veh_location : out data port variables::distance;
+	annex EMV2 
+	  {** 
+	    use types ErrorLibrary, ForwardCollisionWarning ;
+		error propagations
+		  frv_obstacle_detection: in propagation {DistanceWrongValue, InternalError, SensorStatusError};
+		  frv_speed: in propagation {SpeedWrongValue};
+		  trv_speed: out propagation {SpeedWrongValue};
+		  frv_veh_location : in propagation {DistanceWrongValue};
+		  trv_veh_location : out propagation {DistanceWrongValue};
+		end propagations;
+	  **};
+end comm_with_remote_veh;
+
+process implementation comm_with_remote_veh.impl
+end comm_with_remote_veh.impl;
+
+process veh_sensor_data
+	features
+		fvdb_veh_speed :in data port variables::speed;
+		sensor_data : in data port;
+	annex EMV2 
+	  {** 
+	    use types ErrorLibrary, ForwardCollisionWarning;
+		error propagations
+		  fvdb_veh_speed: in propagation {SpeedWrongValue, InternalError, SensorStatusError};
+		  sensor_data: in propagation {InternalError, SensorStatusError};
+		end propagations;
+	  **};
+end veh_sensor_data;
+
+process implementation veh_sensor_data.impl
+	subcomponents
+		speed : thread speed.impl;
+	connections 
+		speed1 : port fvdb_veh_speed-> speed.fvdb_speed;
+		pos : port sensor_data -> speed.position;
+		spd : port sensor_data -> speed.fvdb_speed;
+end veh_sensor_data.impl;
+
+thread speed
+	features
+		fvdb_speed : in data port variables::speed;
+		position : in data port variables::distance;
+	annex EMV2 
+	  {** 
+	    use types ErrorLibrary, ForwardCollisionWarning;
+		error propagations
+		  fvdb_speed: in propagation {SpeedWrongValue, InternalError, SensorStatusError};
+		  position: in propagation {DistanceWrongValue, SensorStatusError};
+		end propagations;
+	  **};
+end speed;
+
+thread implementation speed.impl
+end speed.impl;
+
+process veh_location_data
+	features
+		fvltds_loc : in data port variables::distance;
+		veh_loc_in_road : out data port variables::distance;
+	annex EMV2 
+	  {** 
+	    use types ErrorLibrary, ForwardCollisionWarning;
+		error propagations
+		  fvltds_loc: in propagation {DistanceWrongValue, SensorStatusError};
+		  veh_loc_in_road: in propagation {DistanceWrongValue, SensorStatusError};
+		end propagations;
+	  **};
+end veh_location_data;
+
+process implementation veh_location_data.impl
+end veh_location_data.impl;
+
+
+system remote_vehicle_obe
+	features
+		em_ack : in out data port;
+		em_noti : in out data port;
+		em_noti_r : in out data port;
+		int_info : in out data port;
+		sp_vehicle : in out data port;
+		vehi_control : in out event port;
+		vehi_env : in out data port;
+		vehi_hazard : in out event port;
+		vehi_lm : in out data port;
+		vehi_plat : in out data port;
+	annex EMV2 
+	  {** 
+	    use types ErrorLibrary, ForwardCollisionWarning;
+		error propagations
+		  vehi_lm: in propagation {SpeedWrongValue, DistanceWrongValue};
+		  int_info: in propagation {ValueError};
+		end propagations;
+	  **};
+end remote_vehicle_obe;
+
+system implementation remote_vehicle_obe.impl
+end remote_vehicle_obe.impl;
+
+end ForwardCollisionWarning;

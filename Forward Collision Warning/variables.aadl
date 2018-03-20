@@ -1,0 +1,30 @@
+package variables
+
+public
+	with Data_Model;
+
+	data integer_type
+		properties
+		Data_Model::Data_Representation => integer;
+	end integer_type;
+	
+	data float_type
+		properties
+		Data_Model::Data_Representation => float;
+	end float_type;
+		
+	data speed
+	  properties
+	  Data_Model::Base_Type => (classifier(float_type));  
+	  Data_Model::Real_Range => 0.0 .. 160.0;
+	  Data_Model::Measurement_Unit => "miles/hour";
+	end speed;
+	
+	data distance
+	  properties
+	  Data_Model::Base_Type => (classifier(float_type));  
+	  Data_Model::Real_Range => 0.0 .. 20.0;
+	  Data_Model::Measurement_Unit => "miles";
+	end distance;
+	
+end variables;
