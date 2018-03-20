@@ -1,0 +1,59 @@
+case tollAssuranceCase
+[
+	tbdcount 0
+	model tollAssuranceCase.tollAssurancePlan
+	for Toll_Collection
+		[
+		tbdcount 0
+		claim tollReqs.req1
+		[
+			tbdcount 0
+			verification TollPlan.acc_ActTest1
+			[
+				executionstate todo
+				resultstate tbd
+				tbdcount 0
+			]
+		]
+		claim tollReqs.req3
+		[
+			tbdcount 0
+			verification TollPlan.pay_ActTest1
+			[
+				executionstate todo
+				resultstate tbd
+				tbdcount 0
+			]
+		]
+		claim tollReqs.req4
+		[
+			tbdcount 0
+			verification TollPlan.pro_ActTest1
+			[
+				executionstate todo
+				resultstate tbd
+				tbdcount 0
+			]
+		]
+		claim tollReqs.req5
+		[
+			tbdcount 0
+			verification TollPlan.vio_ActTest1
+			[
+				executionstate todo
+				resultstate tbd
+				tbdcount 0
+			]
+		]
+		claim tollReqs.req6
+		[
+			tbdcount 0
+			verification TollPlan.notif_ActTest1
+			[
+				executionstate todo
+				resultstate tbd
+				tbdcount 0
+			]
+		]
+		]
+]

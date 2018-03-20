@@ -1,0 +1,64 @@
+verification plan tollPlan for tollReqs[
+
+	description"This is the verification plan for the requirements in tollReqs"
+	
+		claim req1:"The user account is setup correctly" [		
+			rationale "This plan achieves a certification level of verification"
+			
+			activities
+			acc_ActTest1:"Test of successful account setup":
+			tollVerificationMethods.comp(setacc)
+			property values ()
+			[
+				weight 2
+				timeout 5
+			]			
+			
+			assert all[acc_ActTest1]
+	]  
+	claim req3: "The payment is completed successfully" [
+			activities
+			pay_ActTest1:"Test of successful toll payment":
+			tollVerificationMethods.comp(vehicle_paymnt_info)
+			property values ()
+			[
+				weight 3
+				timeout 5
+			]
+			assert all[pay_ActTest1]
+	]
+	claim req4: "The payment is processed successfully" [
+			activities
+			pro_ActTest1:"Test of successful toll payment processing":
+			tollVerificationMethods.comp(vehicle_paymnt_info)
+			property values ()
+			[
+				weight 2
+				timeout 5
+			]
+			assert all[pro_ActTest1]
+	]
+	claim req5: "The violation is detected successfully" [
+		activities
+		vio_ActTest1:"Test of successful violation detection":
+			tollVerificationMethods.comp(vehicle_paymnt_info)
+			property values ()
+			[
+				weight 3
+				timeout 5
+			]
+			assert all[vio_ActTest1]
+	]
+	claim req6: "The violation notification is generated"  [
+			activities
+			notif_ActTest1:"Test of generation of notification":
+			tollVerificationMethods.comp(paymnt_violatn_notif)
+			property values ()
+			[
+				weight 2
+				timeout 5
+			]
+			assert all[notif_ActTest1]
+	]
+]
+

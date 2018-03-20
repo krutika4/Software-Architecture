@@ -1,0 +1,51 @@
+SystemRequirements::=
+system requirements user_account for payment_administration_center|driver
+[
+ requirement req1 : "Setup account"
+[
+val setacc = "0" or "1"
+description " it creates user account"
+rationale "account needed in order to process payment"
+quality usability
+]
+requirement req2 : "Update account"
+[
+description " it updates user details" 
+rationale "user might need to change his details" 
+quality usability
+]
+]
+
+system requirements toll_pay for driver
+[
+requirement req3 : "make payment"
+[
+compute vehicle_paymnt_info
+value predicate vehicle_paymnt_info > 0
+description " the user makes payment"
+]
+]
+
+system requiements payment_processing for payment_administration_center
+[
+requirement req4 : "process payment"
+[
+compute vehicle_paymnt_info
+value predicate vehicle_paymnt_info > 0
+description "the payment is processed after user has submitted payment"
+rationale "The payment needs to be processed"
+mitigates "Invalid payment"
+]
+requirement req5 : "detect violation"
+[
+compute vehicle_paymnt_info
+decription "any violation in payment of toll is detected"
+mitigates "payment violation"
+]
+requirement req6 : "notify violation"
+[
+val paymnt_violatn_notif 
+description " payment administrator notifies the user of any violation in payment"
+rationale "user needs to be notified of violations committed"
+]
+]
